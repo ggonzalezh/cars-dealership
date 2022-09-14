@@ -1,24 +1,33 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post} from '@nestjs/common';
-import {CarsService} from "./cars.service";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { CarsService } from './cars.service';
+import { CreateCarDto } from './dto/create-car.dto';
 
 @Controller('cars')
 export class CarsController {
+  constructor(private readonly carsService: CarsService) {}
 
-    constructor(private readonly carsService: CarsService) {}
+  @Get()
+  getAllCars() {
+    return this.carsService.findAll();
+  }
 
-    @Get()
-    getAllCars() {
-        return this.carsService.findAll()
-    }
+  @Get(':id')
+  getCarsById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.carsService.findOneById(id);
+  }
 
-    @Get(':id')
-    getCarsById(@Param('id', ParseIntPipe) id : number) {
-        return this.carsService.findOneById(id)
-    }
-
-    @Post()
-    createCar(@Body() body: any) {
-        return body
-    }
-
+  @Post()
+  @UsePipes(ValidationPipe)
+  createCar(@Body() createCarDto: CreateCarDto) {
+    return createCarDto;
+  }
 }
